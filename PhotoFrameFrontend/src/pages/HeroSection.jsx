@@ -56,7 +56,7 @@ const HeroSection = () => {
 
         {/* Animated Button */}
         <motion.a
-          href="/dashboard"
+          href="/Dashboard"
           initial="hidden"
           animate="visible"
           variants={buttonVariants}
