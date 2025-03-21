@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Typewriter } from 'react-simple-typewriter';
 import { FaArrowRight, FaHeart, FaStar, FaChevronDown } from 'react-icons/fa';
 import image from '../assets/OIP.jpeg'; // Ensure the path is correct
+import { Link } from 'react-router-dom';
 
 const HeroSection = () => {
   // Animation variants
@@ -55,16 +56,17 @@ const HeroSection = () => {
         </motion.p>
 
         {/* Animated Button */}
+        <Link to="/Dashboard">
         <motion.a
-          href="/Dashboard"
           initial="hidden"
           animate="visible"
           variants={buttonVariants}
           className="mt-6 inline-flex items-center bg-indigo-500 px-6 py-3 text-white rounded-lg shadow-lg hover:bg-indigo-700 transition-all"
         >
+          
           Browse Products <FaArrowRight className="ml-2" />
         </motion.a>
-
+        </Link>
         {/* Additional Features */}
         <motion.div
           initial="hidden"
