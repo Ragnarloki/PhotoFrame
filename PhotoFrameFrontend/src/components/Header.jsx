@@ -1,13 +1,24 @@
 import { Link, useNavigate } from "react-router-dom";
 import { GlobalContext } from "./context/GlobalContext";
 import { useContext } from "react";
+import { signOut } from "firebase/auth";
+import { auth } from "./firebase";
 
 const Header = () => {
   const navigate = useNavigate();
    const { user, setUser } = useContext(GlobalContext); // Access context
     
-  const handleLogout = () => {
-    localStorage.removeItem("token");
+
+  const handleLogout = async() => {
+    try {
+      await signOut(auth);
+      localStorage.removeItem("user");
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout Error:", error);
+    }
+  
+   localStorage.removeItem("token");
     localStorage.removeItem("userRole");
     setUser(null);
     navigate("/");

@@ -5,6 +5,8 @@ import { BackgroundBeamsWithCollision } from "../components/ui/background-beams-
 import { FaEnvelope, FaLock } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { GlobalContext } from "../components/context/GlobalContext";
+import { signInWithPopup } from "firebase/auth";
+import { auth, provider } from "../components/firebase";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -12,7 +14,29 @@ const Login = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  const { user, setUser } = useContext(GlobalContext); // Access context
+  const { user, setUser } = useContext(GlobalContext); 
+  
+  const handleGoogleSignIn = async () => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      console.log("User Info:", user);
+
+      setUser({
+        name: user.displayName,
+        email: user.email,
+        photo: user.photoURL,
+      });
+
+      // Store user in local storage
+      localStorage.setItem("user", JSON.stringify(user));
+
+      navigate("/");
+    } catch (error) {
+      console.error("Google Sign-In Error:", error);
+    }
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
@@ -100,9 +124,7 @@ const Login = () => {
             <div className="mt-4 flex justify-center">
               <button
                 className="flex items-center bg-white border border-gray-300 rounded-lg px-4 py-2 shadow-sm hover:bg-gray-50 transition-all"
-                onClick={() => {
-                  // Handle Google login
-                }}
+                onClick={handleGoogleSignIn}
               >
                 <FcGoogle className="mr-2" />
                 <span>Google</span>

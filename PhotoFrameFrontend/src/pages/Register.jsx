@@ -1,8 +1,12 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { BackgroundBeamsWithCollision } from "../components/ui/background-beams-with-collision";
 import { FaUser, FaEnvelope, FaLock, FaUserTag } from "react-icons/fa";
+import { GlobalContext } from "../components/context/GlobalContext";
+import { signInWithPopup } from "firebase/auth";
+import { auth, provider } from "../components/firebase";
+import { FcGoogle } from "react-icons/fc";
 
 const Register = () => {
   const [name, setName] = useState("");
@@ -12,6 +16,28 @@ const Register = () => {
   const [error, setError] = useState("");
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
+  const { setUser } = useContext(GlobalContext);
+
+  const handleGoogleSignUp = async () => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      console.log("Registered User:", user);
+
+      setUser({
+        name: user.displayName,
+        email: user.email,
+        photo: user.photoURL,
+      });
+
+      // Store user in local storage
+      localStorage.setItem("user", JSON.stringify(user));
+
+      navigate("/");
+    } catch (error) {
+      console.error("Google Sign-Up Error:", error);
+    }
+  };
 
   const handleRoleChange = (e) => {
     const selectedRole = e.target.value;
@@ -116,16 +142,37 @@ const Register = () => {
             <button className="w-full bg-indigo-600 text-white p-2 rounded-lg hover:bg-indigo-700 transition-all">
               Register
             </button>
+           
           </form>
+
           <p className="text-center mt-4 text-gray-700">
             Already have an account?{" "}
             <a href="/login" className="text-indigo-600 hover:underline">
               Login here
             </a>
           </p>
+          <div className="mt-6">
+                      <div className="relative">
+                        <div className="absolute inset-0 flex items-center">
+                          <div className="w-full border-t border-gray-300"></div>
+                        </div>
+                        <div className="relative flex justify-center text-sm">
+                          <span className="px-2 bg-white text-gray-500">Or continue with</span>
+                        </div>
+                      </div>
+                      <div className="mt-4 flex justify-center">
+                        <button
+                          className="flex items-center bg-white border border-gray-300 rounded-lg px-4 py-2 shadow-sm hover:bg-gray-50 transition-all"
+                          onClick={handleGoogleSignUp}
+                        >
+                          <FcGoogle className="mr-2" />
+                          <span>Google</span>
+                        </button>
+                      </div>
+                    </div>
         </div>
       </div>
-
+      
       {/* Success Modal */}
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
@@ -135,6 +182,7 @@ const Register = () => {
           </div>
         </div>
       )}
+     
     </BackgroundBeamsWithCollision>
   );
 };

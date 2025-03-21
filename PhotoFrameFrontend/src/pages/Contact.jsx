@@ -7,7 +7,7 @@ export default function Contact() {
         email: 'sivasankarswaminathan62@gmail.com',
         mobile: '9361487662',
         whatsapp: 'https://wa.me/9361487662',
-        instagram: 'https://www.instagram.com/your_instagram_handle', // Add your Instagram handle
+        instagram: 'https://www.instagram.com/siva_white_oc', // Add your Instagram handle
         location: '22, Pillaiyar Koil Steet, Goripalayam, Madurai, Tamil Nadu 625002',
         workingHours: 'Mon - Fri: 9 AM - 9 PM'
     };
