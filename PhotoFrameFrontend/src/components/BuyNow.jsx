@@ -1,14 +1,18 @@
-import React, { useState, useEffect } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import React, { useContext, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { GlobalContext } from "./context/GlobalContext";
 
 export default function BuyNow() {
   const location = useLocation();
   const navigate = useNavigate();
+  const {user, setUser } = useContext(GlobalContext);
 
-  // Handle missing product data gracefully
+  const localuser = JSON.parse(localStorage.getItem("user")) || null;
+
   const product = location.state?.product || {
     name: "Unknown Product",
-    price: "N/A",
+    price: 0,
     imageUrl: "/placeholder.png",
   };
 
@@ -16,146 +20,126 @@ export default function BuyNow() {
     name: "",
     phone: "",
     address: "",
-    paymentMethod: "COD",
   });
 
   const [orderPlaced, setOrderPlaced] = useState(false);
-
-  useEffect(() => {
-    // Ensure scroll position resets on navigation
-    window.scrollTo(0, 0);
-
-    // Reset body overflow to allow scrolling
-    document.body.style.overflow = "auto";
-
-    return () => {
-      document.body.style.overflow = "auto";
-    };
-  }, []);
+  const [paymentMethod, setPaymentMethod] = useState("");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setOrderPlaced(true);
-  };
+  const handleOrder = async (method) => {
+    if (!localuser) {
+      alert("Please log in to place an order");
+      return;
+    }
 
-  const handleBack = () => {
-    navigate("/", { replace: true });
-    setTimeout(() => {
-      window.location.reload(); // Force page refresh to avoid UI glitches
-    }, 100);
+    const orderData = {
+      userId: localuser.id,
+      productName: product.name,
+      price: product.price,
+      imageUrl: product.imageUrl,
+      name: formData.name,
+      phone: formData.phone,
+      address: formData.address,
+      paymentMethod: method,
+      status: "Pending",
+    };
+
+    try {
+      const response = await axios.post("http://localhost:5000/api/orders", orderData);
+      if (response.status === 201) {
+        setPaymentMethod(method);
+        setOrderPlaced(true);
+      }
+    } catch (error) {
+      console.log(orderData)
+      console.log(user)
+      console.error("Error placing order:", error);
+      alert("Failed to place order. Please try again.");
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 p-6">
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md">
-        {/* Back Button */}
-        <button onClick={handleBack} className="text-gray-600 dark:text-gray-300 hover:text-blue-500 mb-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-6">
+      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+        <button onClick={() => navigate("/")} className="text-gray-600 hover:text-blue-500 mb-4">
           ← Back
         </button>
-
-        {/* Order Confirmation */}
         {orderPlaced ? (
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-green-600">🎉 Order Placed!</h2>
-            <p className="text-gray-600 dark:text-gray-300 mt-2">
-              Your order has been successfully placed.
+            <h2 className="text-2xl font-bold text-green-600">🎉 Order Placed Successfully!</h2>
+            <p className="text-gray-600 mt-2">
+              Your order for <span className="font-semibold">{product.name}</span> has been placed using{" "}
+              <span className="font-semibold">{paymentMethod}</span>.
             </p>
             <button
-              onClick={handleBack}
-              className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              onClick={() => navigate("/")}
+              className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
               Continue Shopping
             </button>
           </div>
         ) : (
           <>
-            {/* Product Info */}
             <div className="flex items-center space-x-4">
-              <img
-                src={product.imageUrl}
-                alt={product.name}
-                className="w-24 h-24 object-cover rounded-lg"
-              />
+              <img src={product.imageUrl} alt={product.name} className="w-24 h-24 object-cover rounded-lg" />
               <div>
                 <h2 className="text-xl font-semibold">{product.name}</h2>
                 <p className="text-lg font-bold text-blue-600">₹{product.price}</p>
               </div>
             </div>
-
-            {/* Checkout Form */}
-            <form onSubmit={handleSubmit} className="mt-4 space-y-4">
-              {/* Name */}
+            <form className="mt-4 space-y-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-600 dark:text-gray-300">
-                  Full Name
-                </label>
+                <label className="block text-sm font-semibold text-gray-600">Full Name</label>
                 <input
                   type="text"
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring focus:ring-blue-300 dark:bg-gray-700 dark:text-white"
+                  className="w-full px-3 py-2 border rounded-lg focus:ring focus:ring-blue-300"
                   required
                 />
               </div>
-
-              {/* Phone */}
               <div>
-                <label className="block text-sm font-semibold text-gray-600 dark:text-gray-300">
-                  Phone Number
-                </label>
+                <label className="block text-sm font-semibold text-gray-600">Phone Number</label>
                 <input
                   type="tel"
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring focus:ring-blue-300 dark:bg-gray-700 dark:text-white"
+                  className="w-full px-3 py-2 border rounded-lg focus:ring focus:ring-blue-300"
                   required
                 />
               </div>
-
-              {/* Address */}
               <div>
-                <label className="block text-sm font-semibold text-gray-600 dark:text-gray-300">
-                  Shipping Address
-                </label>
+                <label className="block text-sm font-semibold text-gray-600">Shipping Address</label>
                 <textarea
                   name="address"
                   value={formData.address}
                   onChange={handleChange}
                   rows="3"
-                  className="w-full px-3 py-2 border rounded-lg focus:ring focus:ring-blue-300 dark:bg-gray-700 dark:text-white"
+                  className="w-full px-3 py-2 border rounded-lg focus:ring focus:ring-blue-300"
                   required
                 ></textarea>
               </div>
-
-              {/* Payment Method */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-600 dark:text-gray-300">
-                  Payment Method
-                </label>
-                <select
-                  name="paymentMethod"
-                  value={formData.paymentMethod}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring focus:ring-blue-300 dark:bg-gray-700 dark:text-white"
+              <div className="flex flex-col gap-3">
+                <button
+                  type="button"
+                  onClick={() => handleOrder("Online Payment")}
+                  className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                 >
-                  <option value="COD">Cash on Delivery</option>
-                  <option value="Online">Online Payment</option>
-                </select>
+                  Pay Online
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleOrder("Cash on Delivery")}
+                  className="w-full px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-700"
+                >
+                  Cash on Delivery
+                </button>
               </div>
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                className="w-full px-4 py-2 bg-gradient-to-r from-green-500 to-green-700 text-white rounded-lg hover:shadow-lg transition"
-              >
-                Place Order
-              </button>
             </form>
           </>
         )}

@@ -5,8 +5,7 @@ import axios from 'axios';
 
 const Dashboard = () => {
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-
+  
   useEffect(() => {
     const getProducts = async () => {
       try {
@@ -14,9 +13,7 @@ const Dashboard = () => {
         setProducts(response.data);
       } catch (error) {
         console.error("Error fetching products:", error);
-      } finally {
-        setLoading(false); // Ensure loading is set to false after fetching
-      }
+      } 
     };
 
     getProducts();
@@ -29,9 +26,7 @@ const Dashboard = () => {
           Product Dashboard
         </h2>
 
-        {loading ? (
-          <p className="text-black text-lg text-center animate-pulse">Loading products...</p>
-        ) : (
+
           <div className="container mx-auto my-4 px-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {products.length > 0 ? (
@@ -42,7 +37,7 @@ const Dashboard = () => {
               )}
             </div>
           </div>
-        )}
+        
       </div>
     </div>
   );

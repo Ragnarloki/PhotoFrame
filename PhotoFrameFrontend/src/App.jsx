@@ -8,6 +8,7 @@ import Home from './pages/Home';
 import { useContext, useEffect, useState } from 'react';
 import BuyNow from './components/BuyNow';
 import { GlobalContext } from './components/context/GlobalContext';
+import BrowseCollection from './pages/BrowseCollection';
 
 const App = () =>{  
  const { user, setUser } = useContext(GlobalContext); // Access context
@@ -20,6 +21,8 @@ const App = () =>{
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/Dashboard" element={<Dashboard />} />
+      <Route path="/BrowseCollection" element={<BrowseCollection />} />
+      
       <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         {user?.role === "admin" && <Route path="/upload" element={<UploadProduct />} />}

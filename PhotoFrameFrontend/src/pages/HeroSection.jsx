@@ -56,7 +56,7 @@ const HeroSection = () => {
         </motion.p>
 
         {/* Animated Button */}
-        <Link to="/Dashboard">
+        <Link to="/BrowseCollection">
         <motion.a
           initial="hidden"
           animate="visible"

@@ -30,7 +30,6 @@ const Login = () => {
 
       // Store user in local storage
       localStorage.setItem("user", JSON.stringify(user));
-
       navigate("/");
     } catch (error) {
       console.error("Google Sign-In Error:", error);
@@ -41,17 +40,31 @@ const Login = () => {
     e.preventDefault();
     try {
       const response = await axios.post("http://localhost:5000/api/auth/login", { email, password });
+  
+      // Save user details in localStorage
+      const userData = {
+        id: response.data.userId,
+        name: response.data.name,
+        email: response.data.email,
+        role: response.data.role
+      };
+  
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("userRole", response.data.role);
+      
+      localStorage.setItem("user", JSON.stringify(userData));
+      
       if (rememberMe) {
         localStorage.setItem("rememberMe", "true");
       }
-      setUser({ email, role: response.data.role });
+  
+      setUser(userData);
       navigate("/");
     } catch (err) {
       setError("Invalid email or password");
     }
   };
+  
 
   return (
     <BackgroundBeamsWithCollision>
