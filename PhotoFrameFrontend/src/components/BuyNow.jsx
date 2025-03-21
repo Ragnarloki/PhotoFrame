@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link, Links, useLocation, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 export default function BuyNow() {
   const location = useLocation();
@@ -21,6 +21,18 @@ export default function BuyNow() {
 
   const [orderPlaced, setOrderPlaced] = useState(false);
 
+  useEffect(() => {
+    // Ensure scroll position resets on navigation
+    window.scrollTo(0, 0);
+
+    // Reset body overflow to allow scrolling
+    document.body.style.overflow = "auto";
+
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, []);
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -30,15 +42,20 @@ export default function BuyNow() {
     setOrderPlaced(true);
   };
 
+  const handleBack = () => {
+    navigate("/", { replace: true });
+    setTimeout(() => {
+      window.location.reload(); // Force page refresh to avoid UI glitches
+    }, 100);
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 p-6">
       <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md">
         {/* Back Button */}
-        <Link to={"/"}
-          className="text-gray-600 dark:text-gray-300 hover:text-blue-500 mb-4"
-        >
+        <button onClick={handleBack} className="text-gray-600 dark:text-gray-300 hover:text-blue-500 mb-4">
           ← Back
-        </Link>
+        </button>
 
         {/* Order Confirmation */}
         {orderPlaced ? (
@@ -47,11 +64,12 @@ export default function BuyNow() {
             <p className="text-gray-600 dark:text-gray-300 mt-2">
               Your order has been successfully placed.
             </p>
-            <Link to={"/"}
+            <button
+              onClick={handleBack}
               className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
             >
               Continue Shopping
-            </Link>
+            </button>
           </div>
         ) : (
           <>
