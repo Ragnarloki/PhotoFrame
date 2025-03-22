@@ -28,7 +28,7 @@ const Login = () => {
         email: user.email,
         photo: user.photoURL,
       });
-      const expirationTime = Date.now() + 60 * 60 * 1000; // Current time + 1 hour
+      const expirationTime = Date.now() +  30 * 60 * 1000; // Current time + 1 hour
   
       // Store user in local storage
       localStorage.setItem("user", JSON.stringify(user));
@@ -52,7 +52,7 @@ const Login = () => {
         role: data.role,
       };
   
-      const expirationTime = Date.now() + 60 * 60 * 1000; // Current time + 1 hour
+      const expirationTime = Date.now() + 30 * 60 * 1000; // Current time + 1 hour
   
       localStorage.setItem("token", data.token);
       localStorage.setItem("userRole", data.role);
@@ -69,23 +69,6 @@ const Login = () => {
       setError("Invalid email or password");
     }
   };
-  
-  const checkExpiration = () => {
-    const expiration = localStorage.getItem("expiration");
-    if (expiration && Date.now() > parseInt(expiration)) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("userRole");
-      localStorage.removeItem("user");
-      localStorage.removeItem("expiration");
-      setUser(null); // Reset user state
-    }
-  };
-  
-  // Run this function when the component mounts
-  useEffect(() => {
-    checkExpiration();
-  }, []);
-  
   
 
   return (

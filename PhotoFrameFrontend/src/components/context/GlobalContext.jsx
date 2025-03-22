@@ -1,4 +1,6 @@
 import React, { createContext, useEffect, useState } from "react";
+import API_URL from "../../api";
+import axios from "axios";
 
 // Create a context
 export const GlobalContext = createContext(null);
@@ -13,8 +15,28 @@ export default function Globalstate({ children }) {
           setUser({ role });
         }
       }, []); 
+
+      const [products, setProducts] = useState([]);
+      const [loading, setLoading] = useState(true);
+      const [filteredProducts, setFilteredProducts] = useState([]);
+      
+      useEffect(() => {
+        const getProducts = async () => {
+          try {
+            const response = await axios.get(`${API_URL}/api/products`);
+            setProducts(response.data);
+            setFilteredProducts(response.data);
+          } catch (error) {
+            console.error("Error fetching products:", error);
+          } finally {
+            setLoading(false);
+          }
+        };
+        getProducts();
+      }, []);
+   
     return (
-        <GlobalContext.Provider value={{ user, setUser }}>
+        <GlobalContext.Provider value={{ user, setUser,loading, setLoading , products, setProducts ,filteredProducts, setFilteredProducts}}>
             {children}
         </GlobalContext.Provider>
     );

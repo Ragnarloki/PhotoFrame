@@ -1,12 +1,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Typewriter } from 'react-simple-typewriter';
-import { FaArrowRight, FaHeart, FaStar, FaChevronDown } from 'react-icons/fa';
+import { FaArrowRight, FaHeart, FaStar } from 'react-icons/fa';
 import image from '../assets/tree.jpeg'; // Ensure the path is correct
 import { Link } from 'react-router-dom';
-
-// const image = 'https://th.bing.com/th/id/R.52cfcdcdcac64935e9288275d534b678?rik=d4Ns2x4TsxMx0Q&riu=http%3a%2f%2fs1.picswalls.com%2fwallpapers%2f2014%2f07%2f19%2ftree-hd-wallpaper_111649215_73.jpg&ehk=1KPnlConQtCN9II8VAVkHmRos62B%2bxYOeWgn%2bNkmmKA%3d&risl=&pid=ImgRaw&r=0';
-
 
 const HeroSection = () => {
   // Animation variants
@@ -18,10 +15,6 @@ const HeroSection = () => {
   const buttonVariants = {
     hidden: { opacity: 0, scale: 0.8 },
     visible: { opacity: 1, scale: 1, transition: { delay: 1, duration: 0.5 } },
-  };
-
-  const scrollToNextSection = () => {
-    document.getElementById('next-section').scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
@@ -60,16 +53,16 @@ const HeroSection = () => {
 
         {/* Animated Button */}
         <Link to="/BrowseCollection">
-        <motion.a
-          initial="hidden"
-          animate="visible"
-          variants={buttonVariants}
-          className="mt-6 inline-flex items-center bg-indigo-500 px-6 py-3 text-white rounded-lg shadow-lg hover:bg-indigo-700 transition-all"
-        >
-          
-          Browse Products <FaArrowRight className="ml-2" />
-        </motion.a>
+          <motion.button
+            initial="hidden"
+            animate="visible"
+            variants={buttonVariants}
+            className="mt-6 inline-flex items-center bg-indigo-500 px-6 py-3 text-white rounded-lg shadow-lg hover:bg-indigo-700 transition-all"
+          >
+            Browse Products <FaArrowRight className="ml-2" />
+          </motion.button>
         </Link>
+
         {/* Additional Features */}
         <motion.div
           initial="hidden"
@@ -87,8 +80,6 @@ const HeroSection = () => {
             <span>5-Star Rated</span>
           </div>
         </motion.div>
-
-     
       </div>
     </div>
   );

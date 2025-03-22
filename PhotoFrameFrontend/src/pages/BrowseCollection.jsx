@@ -1,32 +1,20 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import API_URL from "../api";
 import ProductCard from "../components/ProductCard";
 import axios from "axios";
 import { FaArrowUp } from "react-icons/fa";
+import { GlobalContext } from "../components/context/GlobalContext";
 
 const BrowseCollection = () => {
-  const [products, setProducts] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const {filteredProducts, setFilteredProducts} = useContext(GlobalContext);
+  const {loading, setLoading} = useContext(GlobalContext);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [sortOrder, setSortOrder] = useState("default");
   const [showScroll, setShowScroll] = useState(false);
+  const { products, setProducts } = useContext(GlobalContext); 
+  
 
-  useEffect(() => {
-    const getProducts = async () => {
-      try {
-        const response = await axios.get(`${API_URL}/api/products`);
-        setProducts(response.data);
-        setFilteredProducts(response.data);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    getProducts();
-  }, []);
 
   useEffect(() => {
     let filtered = products.filter((product) =>
@@ -74,7 +62,7 @@ const BrowseCollection = () => {
             className="w-full sm:w-80 px-4 py-2 text-white bg-gray-800 rounded-md border-none focus:ring-2 focus:ring-blue-500"
           />
 
-          <select
+          {/* <select
             className="px-4 py-2 rounded-md text-white bg-gray-700 border border-gray-600 focus:ring-2 focus:ring-blue-500 hover:bg-gray-600 transition-colors duration-200 cursor-pointer"
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
@@ -83,7 +71,7 @@ const BrowseCollection = () => {
             <option value="Frames">Frames</option>
             <option value="Glass">Glass</option>
             <option value="Mirrors">Mirrors</option>
-          </select>
+          </select> */}
 
           <select
             className="px-4 py-2 rounded-md text-white bg-gray-700 border border-gray-600 focus:ring-2 focus:ring-blue-500 hover:bg-gray-600 transition-colors duration-200 cursor-pointer"

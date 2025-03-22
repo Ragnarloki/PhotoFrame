@@ -1,20 +1,20 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useContext } from "react";
 import { CardBody, CardContainer, CardItem } from "./ui/3d-card";
 import ProductDetailsModal from "./ProductDetailsModal";
 import { Link } from "react-router-dom";
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
+import { GlobalContext } from "./context/GlobalContext";
 
 export default function ProductCard({ product }) {
-  const [isLoading, setIsLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [rating, setRating] = useState(0);
+   const { loading } = useContext(GlobalContext);
+   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  useEffect(() => {
-    setTimeout(() => {
-      setIsLoading(false);
-      setRating((Math.random() * 2 + 3).toFixed(1)); // Random rating between 3.0 - 5.0
-    }, 1500);
-  }, []);
+   // ✅ Fix: Ensure `product.id` is defined before using `split`
+   const [rating, setRating] = useState(() => {
+      if (!product || !product.id) return 4.0; // Default rating if product is undefined
+      const seed = product.id.toString().split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      return (3.5 + (seed % 15) / 10).toFixed(1); // Generates rating between 3.5 - 5.0
+   });
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -32,25 +32,25 @@ export default function ProductCard({ product }) {
         <CardBody className="bg-gray-50 relative group/card dark:bg-black dark:border-white/[0.2] border-black/[0.1] 
           w-full sm:w-[18rem] md:w-[20rem] h-auto rounded-xl p-4 border shadow-lg transition-transform transform hover:scale-105 duration-300">
           
-          {isLoading ? (
+          {loading ? (
             <SkeletonCard />
           ) : (
             <>
               <CardItem translateZ="50" className="w-full h-48 overflow-hidden rounded-lg">
                 <img
-                  src={product.imageUrl}
-                  alt={product.name}
+                  src={product?.imageUrl || "default-image.jpg"} // ✅ Added fallback image
+                  alt={product?.name || "Unknown Product"}
                   className="w-full h-full object-cover rounded-lg transition-transform duration-300 hover:scale-110"
                 />
               </CardItem>
 
               <div className="mt-4 space-y-2">
                 <CardItem translateZ="50" className="text-lg font-bold text-neutral-600 dark:text-white text-center">
-                  {product.name}
+                  {product?.name || "No Name Available"}
                 </CardItem>
 
                 <CardItem as="p" translateZ="60" className="text-neutral-500 text-sm dark:text-neutral-300 text-center">
-                  {product.description}
+                  {product?.description || "No description available."}
                 </CardItem>
               </div>
 
@@ -61,12 +61,12 @@ export default function ProductCard({ product }) {
               </div>
 
               {/* Stock Status */}
-              <CardItem translateZ="50" className={`text-md font-semibold text-center mt-2 ${product.stock > 0 ? "text-green-600" : "text-red-500"}`}>
-                {product.stock > 0 ? "Out of Stock" : "In Stock"}
+              <CardItem translateZ="50" className={`text-md font-semibold text-center mt-2 ${product?.stock > 0 ? "text-green-600" : "text-red-500"}`}>
+                {product?.stock > 0 ? "In Stock" : "Out of Stock"}
               </CardItem>
 
               <CardItem translateZ="50" className="text-md font-semibold text-blue-600 text-center mt-2">
-                ₹{product.price}
+                ₹{product?.price || "N/A"}
               </CardItem>
 
               <div className="flex justify-between items-center mt-4">
@@ -80,8 +80,9 @@ export default function ProductCard({ product }) {
                   <Link
                     to="/buy-now"
                     state={{ product }}
-                    className="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-bold hover:shadow-lg hover:border-2 hover:border-white transition duration-300">
+                    className="px-3 py-2 rounded-lg text-sm font-medium bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:border-2 hover:border-amber-50 transition ">
                     Buy Now
+                    
                   </Link>
                 </CardItem>
               </div>
@@ -96,29 +97,27 @@ export default function ProductCard({ product }) {
 }
 
 // Skeleton Loader
-const SkeletonCard = () => {
-  return (
-    <div className="animate-pulse">
-      <div className="w-full h-48 bg-gray-300 dark:bg-gray-700 rounded-lg"></div>
-      <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-3/4 my-3 mx-auto"></div>
-      <div className="h-3 bg-gray-300 dark:bg-gray-700 rounded w-5/6 my-2 mx-auto"></div>
-      <div className="h-3 bg-gray-300 dark:bg-gray-700 rounded w-4/6 my-2 mx-auto"></div>
-      <div className="h-5 bg-gray-400 dark:bg-gray-600 rounded w-1/2 my-4 mx-auto"></div>
-      <div className="flex justify-between items-center mt-4">
-        <div className="h-8 w-24 bg-gray-300 dark:bg-gray-700 rounded"></div>
-        <div className="h-8 w-24 bg-gray-300 dark:bg-gray-700 rounded"></div>
-      </div>
+const SkeletonCard = () => (
+  <div className="animate-pulse bg-gray-700 p-4 rounded-lg shadow-md">
+    <div className="h-48 bg-gray-600 rounded-md"></div>
+    <div className="h-4 w-3/4 bg-gray-500 rounded my-3"></div>
+    <div className="h-3 w-5/6 bg-gray-500 rounded my-2"></div>
+    <div className="h-5 w-1/2 bg-gray-400 rounded my-4"></div>
+    <div className="flex justify-between mt-4">
+      <div className="h-8 w-24 bg-gray-500 rounded"></div>
+      <div className="h-8 w-24 bg-gray-500 rounded"></div>
     </div>
-  );
-};
+  </div>
+);
 
 // Function to Generate Star Ratings
 const generateStars = (rating) => {
   const stars = [];
-  const fullStars = Math.floor(rating);
-  const hasHalfStar = rating % 1 !== 0;
+  
+  const adjustedRating = Math.floor(rating);
+  const hasHalfStar = rating % 1 !== 0 && adjustedRating < 5;
 
-  for (let i = 0; i < fullStars; i++) {
+  for (let i = 0; i < adjustedRating; i++) {
     stars.push(<FaStar key={i} className="text-yellow-400" />);
   }
 
