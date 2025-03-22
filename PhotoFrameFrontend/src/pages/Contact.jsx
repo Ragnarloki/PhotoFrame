@@ -27,7 +27,7 @@ export default function Contact() {
 // Contact Info Component
 const ContactInfo = ({ config }) => (
     <motion.div
-        className="flex flex-col items-center w-full max-w-2xl"
+        className="flex flex-col items-center w-full max-w-2xl "
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1 }}

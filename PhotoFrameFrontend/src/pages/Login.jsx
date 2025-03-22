@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { BackgroundBeamsWithCollision } from "../components/ui/background-beams-with-collision";
@@ -28,9 +28,12 @@ const Login = () => {
         email: user.email,
         photo: user.photoURL,
       });
-
+      const expirationTime = Date.now() + 60 * 60 * 1000; // Current time + 1 hour
+  
       // Store user in local storage
       localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("expiration", expirationTime);
+  
       navigate("/");
     } catch (error) {
       console.error("Google Sign-In Error:", error);
@@ -41,8 +44,7 @@ const Login = () => {
     e.preventDefault();
     try {
       const data = await login(email, password);
-
-      // Save additional user data if needed
+  
       const userData = {
         id: data.userId,
         name: data.name,
@@ -50,11 +52,13 @@ const Login = () => {
         role: data.role,
       };
   
+      const expirationTime = Date.now() + 60 * 60 * 1000; // Current time + 1 hour
+  
       localStorage.setItem("token", data.token);
       localStorage.setItem("userRole", data.role);
-      
       localStorage.setItem("user", JSON.stringify(userData));
-      
+      localStorage.setItem("expiration", expirationTime);
+  
       if (rememberMe) {
         localStorage.setItem("rememberMe", "true");
       }
@@ -65,6 +69,23 @@ const Login = () => {
       setError("Invalid email or password");
     }
   };
+  
+  const checkExpiration = () => {
+    const expiration = localStorage.getItem("expiration");
+    if (expiration && Date.now() > parseInt(expiration)) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("userRole");
+      localStorage.removeItem("user");
+      localStorage.removeItem("expiration");
+      setUser(null); // Reset user state
+    }
+  };
+  
+  // Run this function when the component mounts
+  useEffect(() => {
+    checkExpiration();
+  }, []);
+  
   
 
   return (

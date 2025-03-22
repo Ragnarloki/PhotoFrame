@@ -2,8 +2,11 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Typewriter } from 'react-simple-typewriter';
 import { FaArrowRight, FaHeart, FaStar, FaChevronDown } from 'react-icons/fa';
-import image from '../assets/OIP.jpeg'; // Ensure the path is correct
+import image from '../assets/tree.jpeg'; // Ensure the path is correct
 import { Link } from 'react-router-dom';
+
+// const image = 'https://th.bing.com/th/id/R.52cfcdcdcac64935e9288275d534b678?rik=d4Ns2x4TsxMx0Q&riu=http%3a%2f%2fs1.picswalls.com%2fwallpapers%2f2014%2f07%2f19%2ftree-hd-wallpaper_111649215_73.jpg&ehk=1KPnlConQtCN9II8VAVkHmRos62B%2bxYOeWgn%2bNkmmKA%3d&risl=&pid=ImgRaw&r=0';
+
 
 const HeroSection = () => {
   // Animation variants
