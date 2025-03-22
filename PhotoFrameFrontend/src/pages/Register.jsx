@@ -1,5 +1,4 @@
 import React, { useContext, useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { BackgroundBeamsWithCollision } from "../components/ui/background-beams-with-collision";
 import { FaUser, FaEnvelope, FaLock, FaUserTag } from "react-icons/fa";
@@ -8,6 +7,8 @@ import { signInWithPopup } from "firebase/auth";
 import { auth, provider } from "../components/firebase";
 import { FcGoogle } from "react-icons/fc";
 
+import { register } from '../api';
+
 const Register = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -15,6 +16,8 @@ const Register = () => {
   const [role, setRole] = useState("user"); // Default role is 'user'
   const [error, setError] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [adminPopup, setAdminPopup] = useState(false);
+  const [adminPassword, setAdminPassword] = useState("");
   const navigate = useNavigate();
   const { setUser } = useContext(GlobalContext);
 
@@ -30,9 +33,7 @@ const Register = () => {
         photo: user.photoURL,
       });
 
-      // Store user in local storage
       localStorage.setItem("user", JSON.stringify(user));
-
       navigate("/");
     } catch (error) {
       console.error("Google Sign-Up Error:", error);
@@ -43,35 +44,34 @@ const Register = () => {
     const selectedRole = e.target.value;
     setRole(selectedRole);
 
-    // If Admin is selected, show alert and set default password
     if (selectedRole === "admin") {
-      alert("For admin registration, use the password: 12341234");
-      setPassword("12341234");
+      setAdminPopup(true);
     } else {
-      setPassword(""); // Clear password if user selects another role
+      setPassword(""); // Clear password if another role is selected
+    }
+  };
+
+  const verifyAdminPassword = () => {
+    const correctPassword = "12341234"; // Hardcoded admin password
+    if (adminPassword === correctPassword) {
+      setPassword(correctPassword);
+      setAdminPopup(false);
+    } else {
+      alert("Incorrect admin password!");
     }
   };
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    
-    try {
-      await axios.post("https://photoframe-1.onrender.com/api/auth/register", {
-        name,
-        email,
-        password,
-        role,
-      });
 
-      // Show success modal
+    try {
+      await register({ name, email, password, role });
       setShowModal(true);
-      
-      // Redirect after 2 seconds
+
       setTimeout(() => {
         setShowModal(false);
         navigate("/login");
       }, 2000);
-      
     } catch (err) {
       setError(err.response?.data?.message || "Registration failed");
     }
@@ -142,7 +142,6 @@ const Register = () => {
             <button className="w-full bg-indigo-600 text-white p-2 rounded-lg hover:bg-indigo-700 transition-all">
               Register
             </button>
-           
           </form>
 
           <p className="text-center mt-4 text-gray-700">
@@ -152,27 +151,27 @@ const Register = () => {
             </a>
           </p>
           <div className="mt-6">
-                      <div className="relative">
-                        <div className="absolute inset-0 flex items-center">
-                          <div className="w-full border-t border-gray-300"></div>
-                        </div>
-                        <div className="relative flex justify-center text-sm">
-                          <span className="px-2 bg-white text-gray-500">Or continue with</span>
-                        </div>
-                      </div>
-                      <div className="mt-4 flex justify-center">
-                        <button
-                          className="flex items-center bg-white border border-gray-300 rounded-lg px-4 py-2 shadow-sm hover:bg-gray-50 transition-all"
-                          onClick={handleGoogleSignUp}
-                        >
-                          <FcGoogle className="mr-2" />
-                          <span>Google</span>
-                        </button>
-                      </div>
-                    </div>
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">Or continue with</span>
+              </div>
+            </div>
+            <div className="mt-4 flex justify-center">
+              <button
+                className="flex items-center bg-white border border-gray-300 rounded-lg px-4 py-2 shadow-sm hover:bg-gray-50 transition-all"
+                onClick={handleGoogleSignUp}
+              >
+                <FcGoogle className="mr-2" />
+                <span>Google</span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
-      
+
       {/* Success Modal */}
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
@@ -182,7 +181,25 @@ const Register = () => {
           </div>
         </div>
       )}
-     
+
+      {/* Admin Password Popup */}
+      {adminPopup && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+            <h2 className="text-xl font-semibold text-red-600">Admin Access Required</h2>
+            <p className="text-gray-600 mt-2">Enter the admin password to proceed:</p>
+            <input
+              type="password"
+              value={adminPassword}
+              onChange={(e) => setAdminPassword(e.target.value)}
+              className="border p-2 rounded-lg mt-2"
+            />
+            <button className="bg-indigo-600 text-white p-2 rounded-lg mt-4" onClick={verifyAdminPassword}>
+              Verify
+            </button>
+          </div>
+        </div>
+      )}
     </BackgroundBeamsWithCollision>
   );
 };

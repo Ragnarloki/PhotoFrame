@@ -7,6 +7,7 @@ import { FcGoogle } from "react-icons/fc";
 import { GlobalContext } from "../components/context/GlobalContext";
 import { signInWithPopup } from "firebase/auth";
 import { auth, provider } from "../components/firebase";
+import { login } from "../api";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -39,18 +40,18 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("https://photoframe-1.onrender.com/api/auth/login", { email, password });
-  
-      // Save user details in localStorage
+      const data = await login(email, password);
+
+      // Save additional user data if needed
       const userData = {
-        id: response.data.userId,
-        name: response.data.name,
-        email: response.data.email,
-        role: response.data.role
+        id: data.userId,
+        name: data.name,
+        email: data.email,
+        role: data.role,
       };
   
-      localStorage.setItem("token", response.data.token);
-      localStorage.setItem("userRole", response.data.role);
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("userRole", data.role);
       
       localStorage.setItem("user", JSON.stringify(userData));
       

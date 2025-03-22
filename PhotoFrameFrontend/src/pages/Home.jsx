@@ -5,6 +5,7 @@ import Contact from "./Contact";
 import HeroSection from "./HeroSection";
 import { CardHoverEffectDemo } from "../components/CardHoverEffectDemo";
 import { BackgroundBeamsWithCollision } from "../components/ui/background-beams-with-collision";
+import API_URL from "../api";
 
 const Home = () => {
   const [products, setProducts] = useState([]);
@@ -12,7 +13,7 @@ const Home = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get("https://photoframe-1.onrender.com/api/products");
+        const response = await axios.get(`${API_URL}/api/products`);
         setProducts(response.data);
       } catch (error) {
         console.error("Error fetching products:", error);

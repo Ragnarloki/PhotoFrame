@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { fetchProducts } from '../api';  // Ensure this function is correctly defined in ../api
+import API_URL, { fetchProducts } from '../api';  // Ensure this function is correctly defined in ../api
 import ProductCard from '../components/ProductCard';
 import axios from 'axios';
 
@@ -9,7 +9,7 @@ const Dashboard = () => {
   useEffect(() => {
     const getProducts = async () => {
       try {
-        const response = await axios.get("https://photoframe-1.onrender.com/api/products");
+        const response = await axios.get(`${API_URL}/api/products`);
         setProducts(response.data);
       } catch (error) {
         console.error("Error fetching products:", error);

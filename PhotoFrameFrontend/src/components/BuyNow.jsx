@@ -2,6 +2,7 @@ import React, { useContext, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { GlobalContext } from "./context/GlobalContext";
+import API_URL from "../api";
 
 export default function BuyNow() {
   const location = useLocation();
@@ -48,7 +49,7 @@ export default function BuyNow() {
     };
 
     try {
-      const response = await axios.post("https://photoframe-1.onrender.com/api/orders", orderData);
+      const response = await axios.post(`${API_URL}/api/orders`, orderData);
       if (response.status === 201) {
         setPaymentMethod(method);
         setOrderPlaced(true);

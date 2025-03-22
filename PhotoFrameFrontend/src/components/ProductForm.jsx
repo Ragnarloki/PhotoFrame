@@ -41,7 +41,7 @@ const ProductForm = () => {
     data.append("image", formData.image);
 
     try {
-      await axios.post("https://photoframe-1.onrender.com/api/products/upload", data);
+      await axios.post(`${API_URL}/api/products/upload`, data);
       alert("Product uploaded successfully!");
       window.location.reload();
     } catch (error) {

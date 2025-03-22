@@ -3,6 +3,7 @@ import axios from "axios";
 import { motion, useAnimation } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { FaUpload, FaProductHunt, FaInfoCircle, FaDollarSign, FaImage } from "react-icons/fa";
+import { uploadProduct } from "../api";
 
 const ProductForm = () => {
   const [formData, setFormData] = useState({ name: "", description: "", price: "", image: null });
@@ -41,7 +42,7 @@ const ProductForm = () => {
     data.append("image", formData.image);
 
     try {
-      await axios.post("https://photoframe-1.onrender.com/api/products/upload", data);
+      await uploadProduct(data);
       alert("Product uploaded successfully!");
       window.location.reload();
     } catch (error) {

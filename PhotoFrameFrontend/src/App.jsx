@@ -9,7 +9,7 @@ import { useContext, useEffect, useState } from 'react';
 import BuyNow from './components/BuyNow';
 import { GlobalContext } from './components/context/GlobalContext';
 import BrowseCollection from './pages/BrowseCollection';
-
+import Footer from './pages/Footer';
 const App = () =>{  
  const { user, setUser } = useContext(GlobalContext); // Access context
  
@@ -29,6 +29,7 @@ const App = () =>{
       <Route path="/upload" element={<UploadProduct />} />
       <Route path="/buy-now" element={<BuyNow />} />
     </Routes>
+    <Footer />
   </BrowserRouter>
 );
 }
