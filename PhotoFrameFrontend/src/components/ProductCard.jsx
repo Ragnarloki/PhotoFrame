@@ -2,19 +2,23 @@ import React, { useState, useContext } from "react";
 import { CardBody, CardContainer, CardItem } from "./ui/3d-card";
 import ProductDetailsModal from "./ProductDetailsModal";
 import { Link } from "react-router-dom";
-import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
+import { FaStar, FaStarHalfAlt, FaRegStar, FaHeart } from "react-icons/fa";
 import { GlobalContext } from "./context/GlobalContext";
 
 export default function ProductCard({ product }) {
-   const { loading } = useContext(GlobalContext);
-   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { loading } = useContext(GlobalContext);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isWishlisted, setIsWishlisted] = useState(false);
 
-   // ✅ Fix: Ensure `product.id` is defined before using `split`
-   const [rating, setRating] = useState(() => {
-      if (!product || !product.id) return 4.0; // Default rating if product is undefined
-      const seed = product.id.toString().split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
-      return (3.5 + (seed % 15) / 10).toFixed(1); // Generates rating between 3.5 - 5.0
-   });
+  // Generate random rating based on product ID
+  const [rating, setRating] = useState(() => {
+    if (!product || !product.id) return 4.0; // Default rating if product is undefined
+    const seed = product.id.toString().split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return (3.5 + (seed % 15) / 10).toFixed(1); // Generates rating between 3.5 - 5.0
+  });
+
+  // Discount percentage (random for demo purposes)
+  const discountPercentage = Math.floor(Math.random() * 30) + 10; // Random discount between 10% - 40%
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -24,6 +28,10 @@ export default function ProductCard({ product }) {
   const closeModal = () => {
     setIsModalOpen(false);
     document.body.style.overflow = "auto";
+  };
+
+  const toggleWishlist = () => {
+    setIsWishlisted(!isWishlisted);
   };
 
   return (
@@ -36,7 +44,17 @@ export default function ProductCard({ product }) {
             <SkeletonCard />
           ) : (
             <>
-              <CardItem translateZ="50" className="w-full h-48 overflow-hidden rounded-lg">
+              {/* Discount Badge */}
+              {discountPercentage > 0 && (
+                <div className="absolute top-2 right-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full z-10">
+                  {discountPercentage}% OFF
+                </div>
+              )}
+
+              {/* Wishlist Button */}
+
+              {/* Product Image */}
+              <CardItem translateZ="50" className="w-full h-48 overflow-hidden rounded-lg relative">
                 <img
                   src={product?.imageUrl || "default-image.jpg"} // ✅ Added fallback image
                   alt={product?.name || "Unknown Product"}
@@ -45,14 +63,26 @@ export default function ProductCard({ product }) {
               </CardItem>
 
               <div className="mt-4 space-y-2">
-                <CardItem translateZ="50" className="text-lg font-bold text-neutral-600 dark:text-white text-center">
-                  {product?.name || "No Name Available"}
-                </CardItem>
+  {/* Product Name & Wishlist Button */}
+  <div className="flex justify-between items-center">
+    <CardItem translateZ="50" className="text-lg font-bold text-neutral-600 dark:text-white">
+      {product?.name || "No Name Available"}
+    </CardItem>
 
-                <CardItem as="p" translateZ="60" className="text-neutral-500 text-sm dark:text-neutral-300 text-center">
-                  {product?.description || "No description available."}
-                </CardItem>
-              </div>
+    <button
+      onClick={toggleWishlist}
+      className="p-2 bg-white/80 rounded-full shadow-md hover:bg-red-100 transition-colors"
+    >
+      <FaHeart className={`text-lg ${isWishlisted ? "text-red-500" : "text-gray-500"}`} />
+    </button>
+  </div>
+
+  {/* Product Description */}
+  <CardItem as="p" translateZ="60" className="text-neutral-500 text-sm dark:text-neutral-300 text-center">
+    {product?.description || "No description available."}
+  </CardItem>
+</div>
+
 
               {/* Rating System */}
               <div className="flex justify-center items-center mt-2">
@@ -61,14 +91,30 @@ export default function ProductCard({ product }) {
               </div>
 
               {/* Stock Status */}
-              <CardItem translateZ="50" className={`text-md font-semibold text-center mt-2 ${product?.stock > 0 ? "text-green-600" : "text-red-500"}`}>
-                {product?.stock > 0 ? "In Stock" : "Out of Stock"}
-              </CardItem>
+              <div className="mt-2 flex justify-between items-center text-sm text-gray-600 dark:text-gray-300">
+               <span>Stock:</span>
+               {product?.stock > 0 ? (
+                 <span className="px-2 py-1 text-xs font-semibold text-green-700 bg-green-200 rounded-full">
+                   {product.stock} left
+                 </span>
+               ) : (
+                 <span className="px-2 py-1 text-xs font-semibold text-red-700 bg-red-200 rounded-full">
+                   Out of Stock
+                 </span>
+               )}
+             </div>
 
+              {/* Price */}
               <CardItem translateZ="50" className="text-md font-semibold text-blue-600 text-center mt-2">
                 ₹{product?.price || "N/A"}
+                {discountPercentage > 0 && (
+                  <span className="ml-2 text-sm text-gray-500 line-through">
+                    ₹{(product.price * (1 + discountPercentage / 100)).toFixed(2)}
+                  </span>
+                )}
               </CardItem>
 
+              {/* Buttons */}
               <div className="flex justify-between items-center mt-4">
                 <CardItem translateZ={20} as="button"
                   onClick={openModal}
@@ -82,7 +128,6 @@ export default function ProductCard({ product }) {
                     state={{ product }}
                     className="px-3 py-2 rounded-lg text-sm font-medium bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:border-2 hover:border-amber-50 transition ">
                     Buy Now
-                    
                   </Link>
                 </CardItem>
               </div>
@@ -91,6 +136,7 @@ export default function ProductCard({ product }) {
         </CardBody>
       </CardContainer>
 
+      {/* Product Details Modal */}
       {isModalOpen && <ProductDetailsModal product={product} closeModal={closeModal} />}
     </div>
   );

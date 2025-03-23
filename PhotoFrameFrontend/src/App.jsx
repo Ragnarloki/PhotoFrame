@@ -10,6 +10,7 @@ import BuyNow from './components/BuyNow';
 import { GlobalContext } from './components/context/GlobalContext';
 import BrowseCollection from './pages/BrowseCollection';
 import Footer from './pages/Footer';
+import EditProduct from './pages/EditProducts';
 const App = () =>{  
  const { user, setUser } = useContext(GlobalContext); // Access context
  
@@ -20,13 +21,14 @@ const App = () =>{
     <Header />
     <Routes>
       <Route path="/" element={<Home />} />
-      <Route path="/Dashboard" element={<Dashboard />} />
+      {user?.role === "admin" &&   <Route path="/dashboard" element={<Dashboard />} />}
       <Route path="/BrowseCollection" element={<BrowseCollection />} />
       
       <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         {user?.role === "admin" && <Route path="/upload" element={<UploadProduct />} />}
-      <Route path="/upload" element={<UploadProduct />} />
+        <Route path="/edit/:id" element={<EditProduct />} />
+
       <Route path="/buy-now" element={<BuyNow />} />
     </Routes>
     <Footer />

@@ -1,15 +1,23 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { motion, useAnimation } from "framer-motion";
 import { useInView } from "react-intersection-observer";
-import { FaUpload, FaProductHunt, FaInfoCircle, FaDollarSign, FaImage } from "react-icons/fa";
+import { FaUpload, FaProductHunt, FaInfoCircle, FaDollarSign, FaImage, FaSpinner } from "react-icons/fa";
 import { uploadProduct } from "../api";
+import UploadLoader from "./UploadLoader"; // Import Loading Component
 
 const ProductForm = () => {
   const [formData, setFormData] = useState({ name: "", description: "", price: "", image: null });
   const [imagePreview, setImagePreview] = useState(null);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
   const controls = useAnimation();
   const [ref, inView] = useInView();
+
+  // Loading State as a JSON Object
+  const [loadingState, setLoadingState] = useState({
+    loading: false,
+    message: "",
+  });
 
   useEffect(() => {
     if (inView) controls.start("visible");
@@ -31,9 +39,16 @@ const ProductForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.name || !formData.description || !formData.price || !formData.image) {
-      alert("Please fill all the fields before submitting!");
+      setAlertMessage("Please fill all the fields before submitting!");
+      setShowAlert(true);
       return;
     }
+
+    // Start Loading
+    setLoadingState({
+      loading: true,
+      message: "Uploading your product, please wait...",
+    });
 
     const data = new FormData();
     data.append("name", formData.name);
@@ -43,10 +58,21 @@ const ProductForm = () => {
 
     try {
       await uploadProduct(data);
-      alert("Product uploaded successfully!");
-      window.location.reload();
+      setAlertMessage("Product uploaded successfully!");
+      setShowAlert(true);
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
     } catch (error) {
       console.error("Error uploading product:", error);
+      setAlertMessage("Failed to upload product. Please try again.");
+      setShowAlert(true);
+    } finally {
+      // Stop Loading
+      setLoadingState({
+        loading: false,
+        message: "",
+      });
     }
   };
 
@@ -56,14 +82,42 @@ const ProductForm = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-6">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-6 relative">
+      {/* Loading Overlay */}
+      {loadingState.loading && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-md z-50 flex items-center justify-center">
+          <UploadLoader loadingState={loadingState} />
+        </div>
+      )}
+
+      {/* Custom Alert Modal */}
+      {showAlert && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-md z-50 flex items-center justify-center">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3 }}
+            className="bg-white p-6 rounded-lg shadow-lg max-w-sm text-center"
+          >
+            <p className="text-lg font-semibold text-gray-800 mb-4">{alertMessage}</p>
+            <button
+              onClick={() => setShowAlert(false)}
+              className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all"
+            >
+              OK
+            </button>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Product Form */}
       <motion.form
         ref={ref}
         initial="hidden"
         animate={controls}
         variants={formVariants}
         onSubmit={handleSubmit}
-        className="w-full max-w-lg bg-white backdrop-blur-md bg-opacity-80 shadow-2xl rounded-3xl p-8 border border-gray-300"
+        className="w-full max-w-lg bg-white backdrop-blur-md bg-opacity-80 shadow-2xl rounded-3xl p-8 border border-gray-300 relative"
       >
         <h2 className="text-3xl font-bold text-center mb-6 text-indigo-600 flex items-center justify-center">
           <FaUpload className="mr-3 text-indigo-500" /> Add a New Product
@@ -122,27 +176,12 @@ const ProductForm = () => {
           <label className="block text-sm font-medium text-gray-700 mb-1">Product Image</label>
           <div className="relative flex items-center">
             <FaImage className="absolute left-3 text-gray-400" />
-            <input
-              type="file"
-              onChange={handleFileChange}
-              required
-              className="w-full pl-12 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400 focus:outline-none shadow-sm"
-            />
+            <input type="file" onChange={handleFileChange} required className="w-full pl-12 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400 focus:outline-none shadow-sm" />
           </div>
-          {imagePreview && (
-            <div className="mt-4 flex justify-center">
-              <img src={imagePreview} alt="Preview" className="w-40 h-40 object-cover rounded-lg border border-gray-300 shadow-sm" />
-            </div>
-          )}
         </div>
 
         {/* Submit Button */}
-        <button
-          type="submit"
-          className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-3 rounded-lg font-bold hover:from-indigo-600 hover:to-purple-700 shadow-lg transform hover:scale-105 transition-all duration-300"
-        >
-          Upload Product
-        </button>
+        <button type="submit" className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all font-bold">Upload Product</button>
       </motion.form>
     </div>
   );

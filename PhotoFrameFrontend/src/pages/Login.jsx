@@ -8,17 +8,20 @@ import { GlobalContext } from "../components/context/GlobalContext";
 import { signInWithPopup } from "firebase/auth";
 import { auth, provider } from "../components/firebase";
 import { login } from "../api";
+import LoadingScreen from "./LoadingScreen";  // Import the Loading Screen
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);  // Add loading state
   const navigate = useNavigate();
   const { user, setUser } = useContext(GlobalContext); 
   
   const handleGoogleSignIn = async () => {
     try {
+      setLoading(true);  // Show loader
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       console.log("User Info:", user);
@@ -28,21 +31,27 @@ const Login = () => {
         email: user.email,
         photo: user.photoURL,
       });
-      const expirationTime = Date.now() +  30 * 60 * 1000; // Current time + 1 hour
+
+      const expirationTime = Date.now() + 30 * 60 * 1000; // 30 mins expiration
   
       // Store user in local storage
       localStorage.setItem("user", JSON.stringify(user));
       localStorage.setItem("expiration", expirationTime);
   
-      navigate("/");
+      setTimeout(() => {
+        setLoading(false); // Hide loader after login
+        navigate("/");
+      }, 2000);
     } catch (error) {
       console.error("Google Sign-In Error:", error);
+      setLoading(false);
     }
   };
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
+      setLoading(true); // Show loader
       const data = await login(email, password);
   
       const userData = {
@@ -52,7 +61,7 @@ const Login = () => {
         role: data.role,
       };
   
-      const expirationTime = Date.now() + 30 * 60 * 1000; // Current time + 1 hour
+      const expirationTime = Date.now() + 30 * 60 * 1000; // 30 mins expiration
   
       localStorage.setItem("token", data.token);
       localStorage.setItem("userRole", data.role);
@@ -63,15 +72,20 @@ const Login = () => {
         localStorage.setItem("rememberMe", "true");
       }
   
-      setUser(userData);
-      navigate("/");
+      setTimeout(() => {
+        setLoading(false); // Hide loader after login
+        setUser(userData);
+        navigate("/");
+      }, 2000);
     } catch (err) {
+      setLoading(false);
       setError("Invalid email or password");
     }
   };
-  
 
-  return (
+  return loading ? (
+    <LoadingScreen />  // Show loader if loading is true
+  ) : (
     <BackgroundBeamsWithCollision>
       <div className="min-h-screen flex items-center justify-center ">
         <div className="w-full max-w-md bg-white shadow-2xl rounded-lg p-8">

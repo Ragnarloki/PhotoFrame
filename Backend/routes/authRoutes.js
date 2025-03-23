@@ -32,4 +32,12 @@ router.post('/login', async (req, res) => {
   res.json({ token, role: user.role, name: user.name,userId: user._id });
 });
 
+router.get('/users', async (req, res) => {
+  try {
+    const users = await User.find({}, '-password'); // Excluding passwords for security
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error });
+  }
+});
 module.exports = router;

@@ -3,6 +3,7 @@ import { useContext, useEffect, useState, useRef } from "react";
 import { GlobalContext } from "./context/GlobalContext";
 import { signOut } from "firebase/auth";
 import { auth } from "./firebase";
+import { Menu, X } from "lucide-react"; // Icons for the mobile menu
 
 const Header = () => {
   const navigate = useNavigate();
@@ -10,14 +11,15 @@ const Header = () => {
   const [showModal, setShowModal] = useState(false);
   const [countdown, setCountdown] = useState(5);
   const countdownInterval = useRef(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      localStorage.clear(); // Clear all stored data
+      localStorage.clear();
       setUser(null);
       setShowModal(false);
-      navigate("/"); // Redirect to home page
+      navigate("/");
     } catch (error) {
       console.error("Logout Error:", error);
     }
@@ -28,11 +30,8 @@ const Header = () => {
       clearInterval(countdownInterval.current);
       countdownInterval.current = null;
     }
-    
-    // Extend session by 30 minutes
     const newExpiration = Date.now() + 30 * 60 * 1000;
     localStorage.setItem("expiration", newExpiration.toString());
-
     setCountdown(5);
     setShowModal(false);
   };
@@ -41,7 +40,6 @@ const Header = () => {
     const checkExpiration = () => {
       const expiration = localStorage.getItem("expiration");
       if (!expiration) return;
-
       const timeLeft = parseInt(expiration) - Date.now();
 
       if (timeLeft <= 5000 && timeLeft > 0) {
@@ -80,24 +78,72 @@ const Header = () => {
   return (
     <>
       <header className="bg-indigo-600 text-white p-4 flex justify-between items-center relative z-10">
-        <Link to="/" className="text-xl font-bold">Thittani's Photo Frames</Link>
-        <nav className="flex space-x-4">
-          <Link to="/">Home</Link>
-          {user?.role === "admin" && <Link to="/upload">Upload Product</Link>}
+        <Link to="/" className="text-xl font-bold">
+          Thittani's Photo Frames
+        </Link>
+
+        {/* Mobile Menu Button */}
+        <button
+          className="md:hidden text-white focus:outline-none"
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          {menuOpen ? <X size={28} /> : <Menu size={28} />}
+        </button>
+
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex space-x-4">
+          <Link to="/" className="hover:text-gray-200">Home</Link>
+          {user?.role === "admin" && (
+            <>
+              <Link to="/upload" className="hover:text-gray-200">Upload Product</Link>
+              <Link to="/dashboard" className="hover:text-gray-200">Dashboard</Link>
+            </>
+          )}
           {!user ? (
             <>
-              <Link to="/login">Login</Link>
-              <Link to="/register">Register</Link>
+              <Link to="/login" className="bg-blue-500 px-3 py-1 rounded hover:bg-blue-700">Login</Link>
+              <Link to="/register" className="bg-green-500 px-3 py-1 rounded hover:bg-green-700">Register</Link>
             </>
           ) : (
-            <button onClick={handleLogout} className="bg-red-500 px-3 py-1 rounded">Logout</button>
+            <button
+              onClick={handleLogout}
+              className="bg-red-500 px-3 py-1 rounded hover:bg-red-700"
+            >
+              Logout
+            </button>
           )}
         </nav>
       </header>
 
+      {/* Mobile Menu */}
+      {menuOpen && (
+        <nav className="md:hidden absolute top-16 left-0 w-full bg-indigo-700 text-white flex flex-col space-y-2 py-4 shadow-lg z-50">
+          <Link to="/" className="px-4 py-2 hover:bg-indigo-500" onClick={() => setMenuOpen(false)}>Home</Link>
+          {user?.role === "admin" && (
+            <>
+              <Link to="/upload" className="px-4 py-2 hover:bg-indigo-500" onClick={() => setMenuOpen(false)}>Upload Product</Link>
+              <Link to="/dashboard" className="px-4 py-2 hover:bg-indigo-500" onClick={() => setMenuOpen(false)}>Dashboard</Link>
+            </>
+          )}
+          {!user ? (
+            <>
+              <Link to="/login" className="px-4 py-2 bg-blue-500 text-center rounded hover:bg-blue-700" onClick={() => setMenuOpen(false)}>Login</Link>
+              <Link to="/register" className="px-4 py-2 bg-green-500 text-center rounded hover:bg-green-700" onClick={() => setMenuOpen(false)}>Register</Link>
+            </>
+          ) : (
+            <button
+              onClick={handleLogout}
+              className="px-4 py-2 bg-red-500 text-center rounded hover:bg-red-700"
+            >
+              Logout
+            </button>
+          )}
+        </nav>
+      )}
+
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-md z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg text-center w-80 z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg text-center w-80">
             <h2 className="text-lg font-bold">Session Expiring</h2>
             <p className="mt-2 text-gray-700">
               You will be logged out in <span className="font-bold text-red-500">{countdown}</span> seconds.
