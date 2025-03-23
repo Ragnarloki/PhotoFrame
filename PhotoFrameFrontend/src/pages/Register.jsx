@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { BackgroundBeamsWithCollision } from "../components/ui/background-beams-with-collision";
 import { FaUser, FaEnvelope, FaLock, FaUserTag } from "react-icons/fa";
 import { GlobalContext } from "../components/context/GlobalContext";
@@ -28,7 +28,6 @@ const Register = () => {
       setLoading(true);
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
-      console.log("Registered User:", user);
 
       setUser({
         name: user.displayName,
@@ -39,7 +38,7 @@ const Register = () => {
       localStorage.setItem("user", JSON.stringify(user));
       navigate("/");
     } catch (error) {
-      console.error("Google Sign-Up Error:", error);
+      setError("Google Sign-Up Failed!");
     } finally {
       setLoading(false);
     }
@@ -52,7 +51,9 @@ const Register = () => {
     if (selectedRole === "admin") {
       setAdminPopup(true);
     } else {
+      setAdminPassword("");
       setPassword("");
+      setAdminPopup(false);
     }
   };
 
@@ -62,7 +63,9 @@ const Register = () => {
       setPassword(correctPassword);
       setAdminPopup(false);
     } else {
-      alert("Incorrect admin password!");
+      setError("Incorrect admin password! Role set to User.");
+      setRole("user"); // Reset to user if wrong password
+      setAdminPopup(false);
     }
   };
 
@@ -90,7 +93,6 @@ const Register = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="w-full max-w-md bg-white shadow-2xl rounded-lg p-8">
           {loading ? (
-            // Loader animation
             <LoadingScreen />
           ) : (
             <>
@@ -159,9 +161,9 @@ const Register = () => {
 
               <p className="text-center mt-4 text-gray-700">
                 Already have an account?{" "}
-                <a href="/login" className="text-indigo-600 hover:underline">
+                <Link to={"/login"} className="text-indigo-600 hover:underline">
                   Login here
-                </a>
+                </Link>
               </p>
               <div className="mt-6">
                 <div className="relative">
@@ -187,12 +189,26 @@ const Register = () => {
         </div>
       </div>
 
-      {/* Success Modal */}
-      {showModal && (
+      {/* Admin Password Modal */}
+      {adminPopup && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg text-center">
-            <h2 className="text-xl font-semibold text-green-600">Registration Successful!</h2>
-            <p className="text-gray-600 mt-2">Redirecting to login...</p>
+            <h2 className="text-xl font-semibold text-gray-800">Admin Password</h2>
+            <p className="text-gray-600 mt-2">Enter the admin password to continue</p>
+            <input
+              type="password"
+              value={adminPassword}
+              onChange={(e) => setAdminPassword(e.target.value)}
+              className="w-full mt-2 p-2 border rounded-lg outline-none"
+            />
+            <div className="mt-4 flex justify-between">
+              <button className="bg-red-500 text-white px-4 py-2 rounded-lg" onClick={() => setAdminPopup(false)}>
+                Cancel
+              </button>
+              <button className="bg-green-500 text-white px-4 py-2 rounded-lg" onClick={verifyAdminPassword}>
+                Verify
+              </button>
+            </div>
           </div>
         </div>
       )}
