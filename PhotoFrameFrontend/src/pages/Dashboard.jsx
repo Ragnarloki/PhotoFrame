@@ -88,7 +88,7 @@ const Dashboard = () => {
   //   setIsDeleting(true);
   //   try {
   //     await deleteProduct(productToDelete, token);
-  //     console.log("Product deleted successfully:", productToDelete);
+     console.log("Product deleted successfully:", productToDelete);
 
   //     fetchProducts(); // Refresh product list after deletion
   //   } catch (error) {

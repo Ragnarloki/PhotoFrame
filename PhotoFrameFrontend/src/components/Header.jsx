@@ -138,7 +138,7 @@ const Header = () => {
                 >
                   {favoriteProducts.length > 0 ? (
                     favoriteProducts.map((item) => (
-                      <div key={item.id} className="block px-4 py-2 hover:bg-gray-100">
+                      <div key={item._id} className="block px-4 py-2 hover:bg-gray-100">
                         {item.name}
                       </div>
                     ))

@@ -40,7 +40,7 @@ export default function Globalstate({ children }) {
       setUser({ role, token, UserId ,emails,name});
       fetchFavoritesFromDB(UserId); 
       setFavorites(parsedFavorites);
-      console.log(parsedFavorites)// Fetch favorites from the database
+      // console.log(parsedFavorites)// Fetch favorites from the database
     }
   }, []);
 
@@ -67,13 +67,13 @@ export default function Globalstate({ children }) {
       const response = await axios.get(`${API_URL}/api/auth/favorites/${userId}`);
       const favoritesFromDB = response.data.favorites;
     //   setFavorites(favoritesFromDB); // Update favorites state
-       console.log("Favorites from DB:", favoritesFromDB);
-    //   localStorage.setItem("favorites", JSON.stringify(favoritesFromDB)); // Save to localStorage
+    //    console.log("Favorites from DB:", favoritesFromDB);
+    // //   localStorage.setItem("favorites", JSON.stringify(favoritesFromDB)); // Save to localStorage
      } catch (error) {
       console.error("Error fetching favorites:", error);
     }
   };
-console.log(favorites)
+  //  console.log(favorites)
   // Add product to favorites
   const addToFavorites = async (productId) => {
     if (!user?.UserId) {

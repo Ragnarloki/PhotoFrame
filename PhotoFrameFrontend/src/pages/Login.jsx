@@ -24,7 +24,7 @@ const Login = () => {
       setLoading(true);  // Show loader
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
-      console.log("User Info:", user);
+      // console.log("User Info:", user);
 
       setUser({
         id: user.userId,

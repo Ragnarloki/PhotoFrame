@@ -55,8 +55,8 @@ export default function BuyNow() {
         setOrderPlaced(true);
       }
     } catch (error) {
-      console.log(orderData)
-      console.log(user)
+      // console.log(orderData)
+      // console.log(user)
       console.error("Error placing order:", error);
       alert("Failed to place order. Please try again.");
     }
