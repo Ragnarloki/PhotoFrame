@@ -17,7 +17,7 @@ const Login = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);  // Add loading state
   const navigate = useNavigate();
-  const { user, setUser } = useContext(GlobalContext); 
+  const { user, setUser,setFavorites } = useContext(GlobalContext); 
   
   const handleGoogleSignIn = async () => {
     try {
@@ -27,8 +27,9 @@ const Login = () => {
       console.log("User Info:", user);
 
       setUser({
+        id: user.userId,
         name: user.displayName,
-        email: user.email,
+        emails: user.email,
         photo: user.photoURL,
       });
 
@@ -57,28 +58,41 @@ const Login = () => {
       const userData = {
         id: data.userId,
         name: data.name,
-        email: data.email,
+        emails: data.email,
         role: data.role,
       };
   
       const expirationTime = Date.now() + 30 * 60 * 1000; // 30 mins expiration
   
+      localStorage.setItem("UserId", data.userId);
+  
       localStorage.setItem("token", data.token);
       localStorage.setItem("userRole", data.role);
       localStorage.setItem("user", JSON.stringify(userData));
       localStorage.setItem("expiration", expirationTime);
-  
+      localStorage.setItem("favorites", JSON.stringify(data.favorites));
+      setFavorites(data.favorites);
+      localStorage.setItem("email", data.email);
+
+      localStorage.setItem("name", data.name);
+
+      const token = localStorage.getItem("token");
+      const role = localStorage.getItem("userRole");
+      const UserId = localStorage.getItem("UserId");
+      const emails = localStorage.getItem("email");
+      const name = localStorage.getItem("name");
       if (rememberMe) {
         localStorage.setItem("rememberMe", "true");
       }
   
       setTimeout(() => {
         setLoading(false); // Hide loader after login
-        setUser(userData);
+        setUser({ role, token, UserId ,emails,name});        
         navigate("/");
       }, 2000);
     } catch (err) {
       setLoading(false);
+      console.error("Login Error:", err);
       setError("Invalid email or password");
     }
   };

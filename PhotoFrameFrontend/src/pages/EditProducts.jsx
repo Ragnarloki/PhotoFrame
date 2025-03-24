@@ -62,7 +62,7 @@ const EditProduct = () => {
 
     try {
       await updateProduct(id, data);
-      navigate("/products"); // Redirect to products page after update
+      navigate("/dashboard"); // Redirect to products page after update
     } catch (error) {
       console.error("Error updating product:", error);
     } finally {

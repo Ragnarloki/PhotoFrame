@@ -6,6 +6,7 @@ const UserSchema = new mongoose.Schema({
   email: { type: String, unique: true },
   password: String,
   role: { type: String, enum: ['user', 'admin'], default: 'user' },
+  favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }] // Store favorite product IDs
 });
 
 // Hash password before saving

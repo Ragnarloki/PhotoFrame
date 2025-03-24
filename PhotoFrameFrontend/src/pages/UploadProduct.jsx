@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion, useAnimation } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { FaUpload, FaProductHunt, FaInfoCircle, FaDollarSign, FaImage, FaSpinner } from "react-icons/fa";
-import { uploadProduct } from "../api";
+import { updateProduct, uploadProduct } from "../api";
 import UploadLoader from "./UploadLoader"; // Import Loading Component
 
 const ProductForm = () => {

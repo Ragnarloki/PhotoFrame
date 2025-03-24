@@ -39,4 +39,39 @@ export const deleteProduct = async (id, token) => {
   await axios.delete(`${API_URL}/api/products/delete/${id}`, config);
 };
 
+
+export const addToFavorites = async (userId, productId) => {
+  try {
+    const response = await axios.post(`${API_URL}/api/auth/add-favorite`, { userId, productId });
+    return response.data;
+  } catch (error) {
+    console.error('Error adding to favorites:', error);
+    throw error;
+  }
+};
+
+// Remove from Favorites
+export const removeFromFavorites = async (userId, productId) => {
+  try {
+    const response = await axios.post(`${API_URL}/api/auth/remove-favorite`, { userId, productId });
+    return response.data;
+  } catch (error) {
+    console.error('Error removing from favorites:', error);
+    throw error;
+  }
+};
+
+// Get Favorites
+export const getFavorites = async () => {
+  const UserId = localStorage.getItem("UserId");
+   
+  try {
+    const response = await axios.get(`${API_URL}/api/auth/favorites/${UserId}`);
+    return response.data.favorites;
+  } catch (error) {
+    console.error('Error fetching favorites:', error);
+    throw error;
+  }
+};
+
 export default API_URL;
