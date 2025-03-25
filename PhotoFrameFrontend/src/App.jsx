@@ -15,6 +15,7 @@ import Cart from './components/Cart';
 import Profile from './components/Profile';
 import FavoritesPage from './pages/FavoritesPage';
 import Button from './pages/button';
+import ProductDetailsModal from './components/ProductCard';
 
 const App = () =>{  
  const { user, setUser } = useContext(GlobalContext); // Access context
@@ -24,6 +25,7 @@ const App = () =>{
   
   <BrowserRouter>
     <Header />
+   
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/button" element={<Button />} />
@@ -35,6 +37,7 @@ const App = () =>{
       <Route path="/cart" element={<Cart />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/favorites" element={<FavoritesPage />} />
+      <Route path="/productDetails" element={<ProductDetailsModal />} />
       
         <Route path="/register" element={<Register />} />
         {user?.role === "admin" && <Route path="/upload" element={<UploadProduct />} />}

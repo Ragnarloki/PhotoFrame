@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import ProductCard from "../components/ProductCard";
 import Contact from "./Contact";
@@ -10,10 +10,13 @@ import { FaStar, FaArrowRight } from "react-icons/fa";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { GlobalContext } from "../components/context/GlobalContext";
+
 
 const Home = () => {
+  
   const [products, setProducts] = useState([]);
-
+  const {loading, setLoading} = useContext(GlobalContext);
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -48,6 +51,13 @@ const Home = () => {
       {/* Featured Products Section */}
       <div className="container mx-auto my-12 px-4">
         <h2 className="text-3xl font-bold text-center mb-6">Our Best Collection</h2>
+        {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {[...Array(8)].map((_, i) => (
+                <SkeletonCard key={i} />
+              ))}
+            </div>
+          ) : 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {products.length > 0 ? (
           products .slice(0, 4) .map((product) => <ProductCard key={product._id} product={product} />)
@@ -55,7 +65,7 @@ const Home = () => {
          <p className="text-center col-span-full text-gray-500">No products available</p>
          )}
 
-        </div>
+          </div>}
       </div>
       
       {/* About Us Section */}
@@ -97,5 +107,16 @@ const Home = () => {
     </div>
   );
 };
-
+const SkeletonCard = () => (
+  <div className="animate-pulse bg-gray-700 p-4 rounded-lg shadow-md">
+    <div className="h-48 bg-gray-600 rounded-md"></div>
+    <div className="h-4 w-3/4 bg-gray-500 rounded my-3"></div>
+    <div className="h-3 w-5/6 bg-gray-500 rounded my-2"></div>
+    <div className="h-5 w-1/2 bg-gray-400 rounded my-4"></div>
+    <div className="flex justify-between mt-4">
+      <div className="h-8 w-24 bg-gray-500 rounded"></div>
+      <div className="h-8 w-24 bg-gray-500 rounded"></div>
+    </div>
+  </div>
+)
 export default Home;
