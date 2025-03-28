@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { GlobalContext } from "./context/GlobalContext";
 import API_URL from "../api";
@@ -53,6 +53,7 @@ export default function BuyNow() {
       if (response.status === 201) {
         setPaymentMethod(method);
         setOrderPlaced(true);
+       
       }
     } catch (error) {
       // console.log(orderData)
@@ -65,9 +66,9 @@ export default function BuyNow() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-6">
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-        <button onClick={() => navigate("/")} className="text-gray-600 hover:text-blue-500 mb-4">
+        <Link to={"/"} className="text-gray-600 hover:text-blue-500 mb-4">
           ← Back
-        </button>
+        </Link>
         {orderPlaced ? (
           <div className="text-center">
             <h2 className="text-2xl font-bold text-green-600">🎉 Order Placed Successfully!</h2>
@@ -75,12 +76,12 @@ export default function BuyNow() {
               Your order for <span className="font-semibold">{product.name}</span> has been placed using{" "}
               <span className="font-semibold">{paymentMethod}</span>.
             </p>
-            <button
-              onClick={() => navigate("/")}
+            <Link to={"/"}
+              
               className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
               Continue Shopping
-            </button>
+            </Link>
           </div>
         ) : (
           <>
