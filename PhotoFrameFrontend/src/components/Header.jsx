@@ -3,10 +3,10 @@ import { useContext, useEffect, useState, useRef } from "react";
 import { GlobalContext } from "./context/GlobalContext";
 import { signOut } from "firebase/auth";
 import { auth } from "./firebase";
-import { Menu, X, User, Heart } from "lucide-react"; // Icons for the mobile menu
-import { motion } from "framer-motion";
+import { Menu, X, User, Heart } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
-import { getProductById } from "../api"; // Import the function to fetch product details
+import { getProductById } from "../api";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -18,9 +18,9 @@ const Header = () => {
 
   const profileRef = useRef(null);
   const favoritesRef = useRef(null);
+  const mobileMenuRef = useRef(null);
 
   useEffect(() => {
-    // Fetch details of favorite products when the dropdown is opened
     const fetchFavorites = async () => {
       try {
         const products = await Promise.all(
@@ -45,6 +45,10 @@ const Header = () => {
       if (favoritesRef.current && !favoritesRef.current.contains(event.target)) {
         setShowFavoritesDropdown(false);
       }
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target) && 
+          !event.target.classList.contains('mobile-menu-button')) {
+        setMenuOpen(false);
+      }
     }
 
     document.addEventListener("mousedown", handleClickOutside);
@@ -59,20 +63,21 @@ const Header = () => {
       localStorage.clear();
       setUser(null);
       navigate("/");
+      setMenuOpen(false);
     } catch (error) {
       console.error("Logout Error:", error);
     }
   };
 
   return (
-    <header className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-4 flex justify-between items-center relative z-10 shadow-lg">
+    <header className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-4 flex justify-between items-center relative z-50 shadow-lg">
       <Link to="/" className="text-xl font-bold hover:text-gray-200 transition-colors">
         Thittani's Photo Frames
       </Link>
 
       {/* Mobile Menu Button */}
       <button
-        className="md:hidden text-white focus:outline-none"
+        className="md:hidden text-white focus:outline-none mobile-menu-button"
         onClick={() => setMenuOpen(!menuOpen)}
       >
         {menuOpen ? <X size={28} /> : <Menu size={28} />}
@@ -94,7 +99,6 @@ const Header = () => {
           </>
         ) : (
           <>
-            {/* Profile Dropdown */}
             <div ref={profileRef} className="relative">
               <button
                 onClick={() => setShowProfileDropdown(!showProfileDropdown)}
@@ -121,7 +125,6 @@ const Header = () => {
               )}
             </div>
 
-            {/* Favorites Dropdown */}
             <div ref={favoritesRef} className="relative">
               <button
                 onClick={() => setShowFavoritesDropdown(!showFavoritesDropdown)}
@@ -152,6 +155,99 @@ const Header = () => {
           </>
         )}
       </nav>
+
+      {/* Mobile Navigation */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.nav
+            ref={mobileMenuRef}
+            initial={{ opacity: 0, x: '100%' }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: '100%' }}
+            transition={{ type: 'tween' }}
+            className="md:hidden fixed top-0 right-0 h-full w-64 bg-gradient-to-b from-indigo-600 to-purple-600 shadow-xl z-40 pt-16"
+          >
+            <div className="flex flex-col space-y-6 p-6">
+              <Link 
+                to="/" 
+                className="text-white hover:text-gray-200 transition-colors"
+                onClick={() => setMenuOpen(false)}
+              >
+                Home
+              </Link>
+              
+              {user?.role === "admin" && (
+                <>
+                  <Link 
+                    to="/upload" 
+                    className="text-white hover:text-gray-200 transition-colors"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Upload Product
+                  </Link>
+                  <Link 
+                    to="/dashboard" 
+                    className="text-white hover:text-gray-200 transition-colors"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Dashboard
+                  </Link>
+                </>
+              )}
+              
+              {!user ? (
+                <>
+                  <Link 
+                    to="/login" 
+                    className="bg-blue-500 px-3 py-2 rounded hover:bg-blue-700 transition-colors text-center"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Login
+                  </Link>
+                  <Link 
+                    to="/register" 
+                    className="bg-green-500 px-3 py-2 rounded hover:bg-green-700 transition-colors text-center"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Register
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center text-white">
+                    <User size={20} className="mr-2" />
+                    {user.name}
+                  </div>
+                  
+                  <Link 
+                    to="/profile" 
+                    className="text-white hover:text-gray-200 transition-colors"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Profile
+                  </Link>
+                  
+                  <Link 
+                    to="/favorites" 
+                    className="flex items-center text-white hover:text-gray-200 transition-colors"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    <Heart size={20} className="mr-2" />
+                    Favorites
+                  </Link>
+                  
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left text-white hover:text-gray-200 transition-colors"
+                  >
+                    Logout
+                  </button>
+                </>
+              )}
+            </div>
+          </motion.nav>
+        )}
+      </AnimatePresence>
     </header>
   );
 };
