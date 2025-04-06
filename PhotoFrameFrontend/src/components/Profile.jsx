@@ -4,6 +4,9 @@ import { motion } from "framer-motion";
 import { GlobalContext } from "./context/GlobalContext";
 import { getFavorites } from "../api";
 import { FaHeart, FaSignOutAlt, FaEdit, FaSave, FaTrash, FaCamera, FaLock } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import { signOut } from "firebase/auth";
+import { auth } from "./firebase";
 
 const API_URL = import.meta.env.VITE_API_URL;
 const DEFAULT_PROFILE_PIC = "https://th.bing.com/th/id/OIP.2wRpI007gG7aZqFRrBmGRwHaFP?w=270&h=191&c=7&r=0&o=5&dpr=1.4&pid=1.7";
@@ -33,13 +36,17 @@ function Profile() {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("UserId");
-    setUser(null);
-    window.location.href = "/login";
+  const navigate = useNavigate();
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      localStorage.clear();
+      setUser(null);
+      navigate("/");
+    } catch (error) {
+      console.error("Logout Error:", error);
+    }
   };
-
   const handleEdit = () => setIsEditing(true);
 
   const handleSave = async () => {

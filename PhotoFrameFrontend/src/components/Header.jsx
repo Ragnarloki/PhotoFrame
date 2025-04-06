@@ -15,7 +15,7 @@ const Header = () => {
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [showFavoritesDropdown, setShowFavoritesDropdown] = useState(false);
   const [favoriteProducts, setFavoriteProducts] = useState([]);
-
+  
   const profileRef = useRef(null);
   const favoritesRef = useRef(null);
   const mobileMenuRef = useRef(null);
