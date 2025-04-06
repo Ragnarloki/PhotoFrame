@@ -167,6 +167,14 @@ const Header = () => {
             transition={{ type: 'tween' }}
             className="md:hidden fixed top-0 right-0 h-full w-64 bg-gradient-to-b from-indigo-600 to-purple-600 shadow-xl z-40 pt-16"
           >
+            {/* Close Button */}
+            <button
+              onClick={() => setMenuOpen(false)}
+              className="absolute top-4 right-4 text-white focus:outline-none"
+            >
+              <X size={28} />
+            </button>
+
             <div className="flex flex-col space-y-6 p-6">
               <Link 
                 to="/" 
@@ -252,5 +260,4 @@ const Header = () => {
   );
 };
 
-
-export default Header; 
+export default Header;
